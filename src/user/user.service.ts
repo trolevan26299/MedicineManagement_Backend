@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Like, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, In, Like, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -68,6 +68,9 @@ export class UserService {
   }
   async deleteUser(id: number): Promise<DeleteResult> {
     return await this.userRepository.delete(id);
+  }
+  async multipleDelete(ids: string[]): Promise<DeleteResult> {
+    return await this.userRepository.delete({ id: In(ids) });
   }
 
   async updateAvatar(id: number, avatar: string): Promise<UpdateResult> {

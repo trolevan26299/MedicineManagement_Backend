@@ -12,6 +12,7 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
@@ -60,7 +61,16 @@ export class UserController {
   update(@Param('id') id: string, @Body() updateUser: UpdateUserDto) {
     return this.userService.updateUser(Number(id), updateUser);
   }
-  // Delete User
+  // Delete Users
+  @UseGuards(AuthGuard)
+  @Delete('multiple')
+  multipleDelete(
+    @Query('ids', new ParseArrayPipe({ items: String, separator: ',' }))
+    ids: string[],
+  ) {
+    return this.userService.multipleDelete(ids);
+  }
+  // Delete one User
   @UseGuards(AuthGuard)
   @Delete(':id')
   deleteUser(@Param('id') id: string) {
