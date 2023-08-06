@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseArrayPipe,
   Post,
   Put,
   Query,
@@ -132,7 +133,16 @@ export class PostController {
     return this.postService.updatePost(Number(id), updatePost);
   }
 
-  //delete post
+  // Delete Posts
+  @UseGuards(AuthGuard)
+  @Delete('multiple')
+  multipleDelete(
+    @Query('ids', new ParseArrayPipe({ items: String, separator: ',' }))
+    ids: string[],
+  ) {
+    return this.postService.multipleDelete(ids);
+  }
+  //delete one post
   @UseGuards(AuthGuard)
   @Delete(':id')
   deletePost(@Param('id') id: string) {

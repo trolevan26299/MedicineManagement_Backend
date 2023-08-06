@@ -16,6 +16,9 @@ export class CreatePostDto {
   thumbnail: string;
 
   @ApiProperty()
+  quantity: number;
+
+  @ApiProperty()
   status: number;
 
   user: User;
