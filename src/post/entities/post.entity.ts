@@ -23,6 +23,12 @@ export class Post {
   @Column()
   thumbnail: string;
 
+  @Column()
+  quantity: number;
+
+  @Column()
+  price: number;
+
   @Column({ type: 'int', default: 1 })
   status: number;
 
