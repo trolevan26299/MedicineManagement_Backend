@@ -23,7 +23,10 @@ export class PostService {
       });
       return await this.postRepository.findOneBy({ id: res.id });
     } catch (error) {
-      throw new HttpException('Can not create post', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        `Can not create post ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 

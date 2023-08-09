@@ -1,3 +1,4 @@
+import { Category } from 'src/category/entities/category.entity';
 import { Post } from 'src/post/entities/post.entity';
 import {
   Entity,
@@ -41,4 +42,7 @@ export class User {
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
+
+  @OneToMany(() => Category, (category) => category.user)
+  category: Category[];
 }

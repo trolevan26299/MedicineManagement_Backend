@@ -1,17 +1,19 @@
 import { type } from 'os';
 import { Post } from 'src/post/entities/post.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
 export class Category {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
@@ -28,6 +30,9 @@ export class Category {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @ManyToOne(() => User, (user) => user.category)
+  user: User;
 
   @OneToMany(() => Post, (post) => post.category)
   posts: Post[];

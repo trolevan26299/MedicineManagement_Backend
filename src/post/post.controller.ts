@@ -28,7 +28,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @ApiBearerAuth()
-@ApiTags('Posts')
+@ApiTags('Medicines')
 @Controller('posts')
 export class PostController {
   constructor(private postService: PostService) {}
