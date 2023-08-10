@@ -19,7 +19,7 @@ import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { filterCategoryDto } from './dto/filter-category.dto';
-import { UpdateCategoryDto } from './dto/update-post.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @ApiBearerAuth()
 @ApiTags('Categorys')
@@ -65,6 +65,8 @@ export class CategoryController {
     @Req() req: any,
     @Body() updateCategory: UpdateCategoryDto,
   ): Promise<any> {
+    console.log(req['user_data']);
+    console.log('createCategory', updateCategory);
     return this.categoryService.updateCategory(Number(id), updateCategory);
   }
 

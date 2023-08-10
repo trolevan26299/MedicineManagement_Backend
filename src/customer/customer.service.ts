@@ -1,33 +1,35 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Category as CategoryEntity } from './entities/category.entity';
-import { DeleteResult, In, Like, Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateCategoryDto } from './dto/create-category.dto';
+import { Customer as CustomerEntity } from './entities/customer.entity';
+import { DeleteResult, In, Like, Repository, UpdateResult } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
-import { filterCategoryDto } from './dto/filter-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateCustomerDto } from './dto/create-customer.dto';
+import { filterCustomerDto } from './dto/filter-customer.dto';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
-export class CategoryService {
+export class CustomerService {
   constructor(
-    @InjectRepository(CategoryEntity)
-    private categoryRepository: Repository<CategoryEntity>,
+    @InjectRepository(CustomerEntity)
+    private customerRepository: Repository<CustomerEntity>,
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  // Get All Categorys
-  async getAllCategory(query: filterCategoryDto): Promise<any> {
+  async getAllCustomer(query: filterCustomerDto): Promise<any> {
     const items_per_page = Number(query.items_per_page) || 10;
     const page = Number(query.page) || 1;
     const keyword = query.keyword || '';
     const skip = (page - 1) * items_per_page;
-    const [data, totalCount] = await this.categoryRepository.findAndCount({
+    const [data, totalCount] = await this.customerRepository.findAndCount({
       where: [
         {
-          name: Like('%' + keyword + '%'),
+          full_name: Like('%' + keyword + '%'),
         },
         {
-          description: Like('%' + keyword + '%'),
+          phone_number: Like('%' + keyword + '%'),
+        },
+        {
+          email: Like('%' + keyword + '%'),
         },
       ],
       order: { created_at: 'DESC' },
@@ -59,9 +61,8 @@ export class CategoryService {
       lastPage,
     };
   }
-
-  async getDetailCategory(id: number): Promise<CategoryEntity> {
-    return await this.categoryRepository.findOne({
+  async getDetailCustomer(id: number): Promise<CustomerEntity> {
+    return await this.customerRepository.findOne({
       where: { id },
       relations: { user: true },
       select: {
@@ -75,36 +76,36 @@ export class CategoryService {
       },
     });
   }
-
+  // creater customer
   async create(
     userId: number,
-    createCategoryDto: CreateCategoryDto,
-  ): Promise<CategoryEntity> {
+    createCustomer: CreateCustomerDto,
+  ): Promise<CustomerEntity> {
     const user = await this.userRepository.findOneBy({ id: userId });
     try {
-      const res = await this.categoryRepository.save({
-        ...createCategoryDto,
+      const res = await this.customerRepository.save({
+        ...createCustomer,
         user,
       });
 
-      return await this.categoryRepository.findOneBy({ id: res.id });
+      return await this.customerRepository.findOneBy({ id: res.id });
     } catch (error) {
       throw new HttpException(
-        `Can not create category ${error}`,
+        `Can not create customer ${error}`,
         HttpStatus.BAD_REQUEST,
       );
     }
   }
-  async updateCategory(
+  async updateCustomer(
     id: number,
-    updateCategory: UpdateCategoryDto,
+    updateCustomer: UpdateCustomerDto,
   ): Promise<UpdateResult> {
-    return await this.categoryRepository.update(id, updateCategory);
+    return await this.customerRepository.update(id, updateCustomer);
   }
-  async deleteCategory(id: number): Promise<DeleteResult> {
-    return await this.categoryRepository.delete(id);
+  async deleteCustomer(id: number): Promise<DeleteResult> {
+    return await this.customerRepository.delete(id);
   }
   async multipleDelete(ids: string[]): Promise<DeleteResult> {
-    return await this.categoryRepository.delete({ id: In(ids) });
+    return await this.customerRepository.delete({ id: In(ids) });
   }
 }
