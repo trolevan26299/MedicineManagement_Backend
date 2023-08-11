@@ -35,6 +35,7 @@ export class CategoryService {
       skip,
       relations: {
         user: true,
+        posts: true,
       },
       select: {
         user: {
@@ -43,6 +44,11 @@ export class CategoryService {
           last_name: true,
           email: true,
           avatar: true,
+        },
+        posts: {
+          id: true,
+          title: true,
+          price: true,
         },
       },
     });
