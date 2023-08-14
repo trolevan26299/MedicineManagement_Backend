@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PostModule } from './post/post.module';
 import { CategoryModule } from './category/category.module';
 import { CustomerModule } from './customer/customer.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CustomerModule } from './customer/customer.module';
     PostModule,
     CategoryModule,
     CustomerModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

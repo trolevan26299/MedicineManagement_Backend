@@ -1,4 +1,5 @@
 import { Category } from 'src/category/entities/category.entity';
+import { Order } from 'src/order/entities/order.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
@@ -43,4 +44,7 @@ export class Post {
 
   @ManyToOne(() => Category, (category) => category.posts)
   category: Category;
+
+  @ManyToOne(() => Order, (order) => order.post)
+  order: Order;
 }

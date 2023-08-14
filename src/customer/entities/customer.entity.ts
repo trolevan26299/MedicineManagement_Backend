@@ -1,9 +1,11 @@
+import { Order } from 'src/order/entities/order.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -37,6 +39,9 @@ export class Customer {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => User, (user) => user.category)
+  @ManyToOne(() => User, (user) => user.customer)
   user: User;
+
+  @OneToMany(() => Order, (order) => order.customer)
+  order: Order[];
 }
