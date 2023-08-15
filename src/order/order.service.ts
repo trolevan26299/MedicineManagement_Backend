@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Order as OrderEntity } from './entities/order.entity';
 import { OrderDetail as OrderDetailEntity } from './entities/order-detail.entity';
@@ -147,15 +148,14 @@ export class OrderService {
   ): Promise<OrderEntity> {
     // find the order by id
     const order = await this.orderRepository.findOneBy({ id });
+    console.log('id', id);
+    order.description = updateOrder.description;
+    order.total_price = updateOrder.total_price;
+    // update the order with the new details
+    await this.orderRepository.save(order);
 
-    // delete the old details in the order_detail table
-    await this.orderDetailRepository.delete({ order_id: id });
+    await this.orderDetailRepository.delete({ order });
 
-    // update the order with the new data
-    await this.orderRepository.save({
-      ...order,
-      ...updateOrder,
-    });
     // add the new details in the order_detail table
     for (const detail of updateOrder.details) {
       const post = await this.postRepository.findOneBy({ id: detail.id });
@@ -163,15 +163,21 @@ export class OrderService {
       orderDetail.order = order;
       orderDetail.post = post;
       orderDetail.count = detail.count;
-      await this.orderDetailRepository.insert(orderDetail);
+      await this.orderDetailRepository.save(orderDetail);
     }
-    // return the updated order with the new details
+
     return await this.orderRepository.findOneBy({ id });
   }
   async deleteOrder(id: number): Promise<DeleteResult> {
+    // Delete the order details first
+    await this.orderDetailRepository.delete({ order: { id } });
+    // Delete the order
     return await this.orderRepository.delete(id);
   }
   async multipleDelete(ids: string[]): Promise<DeleteResult> {
+    // Delete the order details first
+    await this.orderDetailRepository.delete({ order: { id: In(ids) } });
+    // Delete the orders
     return await this.orderRepository.delete({ id: In(ids) });
   }
 }
