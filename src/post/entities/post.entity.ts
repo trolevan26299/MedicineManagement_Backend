@@ -1,4 +1,5 @@
 import { Category } from 'src/category/entities/category.entity';
+import { OrderDetail } from 'src/order/entities/order-detail.entity';
 import { Order } from 'src/order/entities/order.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -8,6 +9,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  ManyToMany,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -45,6 +48,6 @@ export class Post {
   @ManyToOne(() => Category, (category) => category.posts)
   category: Category;
 
-  @ManyToOne(() => Order, (order) => order.post)
-  order: Order;
+  @OneToMany(() => OrderDetail, (detail) => detail.post)
+  details: OrderDetail[];
 }

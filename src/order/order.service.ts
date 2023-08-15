@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Order as OrderEntity } from './entities/order.entity';
+import { OrderDetail as OrderDetailEntity } from './entities/order-detail.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, In, Like, Repository, UpdateResult } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
@@ -8,6 +9,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { Customer } from 'src/customer/entities/customer.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 @Injectable()
 export class OrderService {
@@ -19,6 +21,8 @@ export class OrderService {
     private customerRepository: Repository<Customer>,
     @InjectRepository(Post)
     private postRepository: Repository<Post>,
+    @InjectRepository(OrderDetailEntity)
+    private orderDetailRepository: Repository<OrderDetailEntity>,
   ) {}
   async getAllOrder(query: filterOrderDto): Promise<any> {
     const items_per_page = Number(query.items_per_page) || 10;
@@ -57,7 +61,9 @@ export class OrderService {
       relations: {
         users: true,
         customer: true,
-        post: true,
+        details: {
+          post: true,
+        },
       },
       select: {
         users: {
@@ -75,11 +81,8 @@ export class OrderService {
           birth_day: true,
           phone_number: true,
         },
-        post: {
-          id: true,
-          title: true,
-          price: true,
-        },
+
+        details: true,
       },
     });
     const lastPage = Math.ceil(totalCount / items_per_page);
@@ -98,7 +101,7 @@ export class OrderService {
   async getDetailOrder(id: number): Promise<OrderEntity> {
     return await this.orderRepository.findOne({
       where: { id },
-      relations: { customer: true, post: true },
+      relations: { customer: true, details: { post: true } },
       select: {
         customer: {
           id: true,
@@ -106,11 +109,7 @@ export class OrderService {
           phone_number: true,
           address: true,
         },
-        post: {
-          id: true,
-          title: true,
-          price: true,
-        },
+        details: true,
       },
     });
   }
@@ -119,14 +118,22 @@ export class OrderService {
     userId: number,
     createOrder: CreateOrderDto,
   ): Promise<OrderEntity> {
-    const user = await this.userRepository.findOneBy({ id: userId });
+    const users = await this.userRepository.findOneBy({ id: userId });
+    console.log('user in service', users);
     try {
-      const res = await this.orderRepository.save({
+      const order = await this.orderRepository.save({
         ...createOrder,
-        user,
+        users,
       });
-
-      return await this.orderRepository.findOneBy({ id: res.id });
+      for (const detail of createOrder.details) {
+        const post = await this.postRepository.findOneBy({ id: detail.id });
+        const orderDetail = new OrderDetailEntity();
+        orderDetail.order = order;
+        orderDetail.post = post;
+        orderDetail.count = detail.count;
+        await this.orderDetailRepository.insert(orderDetail);
+      }
+      return await this.orderRepository.findOneBy({ id: order.id });
     } catch (error) {
       throw new HttpException(
         `Can not create order ${error}`,
@@ -137,8 +144,29 @@ export class OrderService {
   async updateOrder(
     id: number,
     updateOrder: UpdateOrderDto,
-  ): Promise<UpdateResult> {
-    return await this.orderRepository.update(id, updateOrder);
+  ): Promise<OrderEntity> {
+    // find the order by id
+    const order = await this.orderRepository.findOneBy({ id });
+
+    // delete the old details in the order_detail table
+    await this.orderDetailRepository.delete({ order_id: id });
+
+    // update the order with the new data
+    await this.orderRepository.save({
+      ...order,
+      ...updateOrder,
+    });
+    // add the new details in the order_detail table
+    for (const detail of updateOrder.details) {
+      const post = await this.postRepository.findOneBy({ id: detail.id });
+      const orderDetail = new OrderDetailEntity();
+      orderDetail.order = order;
+      orderDetail.post = post;
+      orderDetail.count = detail.count;
+      await this.orderDetailRepository.insert(orderDetail);
+    }
+    // return the updated order with the new details
+    return await this.orderRepository.findOneBy({ id });
   }
   async deleteOrder(id: number): Promise<DeleteResult> {
     return await this.orderRepository.delete(id);

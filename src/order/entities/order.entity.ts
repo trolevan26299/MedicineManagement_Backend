@@ -8,7 +8,10 @@ import {
   CreateDateColumn,
   OneToMany,
   ManyToOne,
+  ManyToMany,
 } from 'typeorm';
+
+import { OrderDetail } from './order-detail.entity';
 
 @Entity()
 export class Order {
@@ -33,6 +36,6 @@ export class Order {
   @ManyToOne(() => Customer, (customer) => customer.order)
   customer: Customer;
 
-  @OneToMany(() => Post, (post) => post.order)
-  post: Post[];
+  @OneToMany(() => OrderDetail, (detail) => detail.order)
+  details: OrderDetail[];
 }

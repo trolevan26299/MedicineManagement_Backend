@@ -1,17 +1,29 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  ArrayNotEmpty,
+  IsNotEmpty,
+  IsNumber,
+  ValidateNested,
+} from 'class-validator';
 import { Customer } from 'src/customer/entities/customer.entity';
-import { Post } from 'src/post/entities/post.entity';
-import { User } from 'src/user/entities/user.entity';
 
+class DetailOrderDto {
+  @IsNotEmpty()
+  id: number;
+
+  @IsNumber()
+  count: number;
+}
 export class UpdateOrderDto {
   @ApiProperty()
   @IsNotEmpty()
   customer: Customer;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  medicine: Post[];
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => DetailOrderDto)
+  details: DetailOrderDto[];
 
   @ApiProperty()
   @IsNotEmpty()

@@ -7,10 +7,11 @@ import { Customer } from 'src/customer/entities/customer.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { ConfigModule } from '@nestjs/config';
 import { Order } from './entities/order.entity';
+import { OrderDetail } from './entities/order-detail.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Customer, Post, Order]),
+    TypeOrmModule.forFeature([User, Customer, Post, Order, OrderDetail]),
     ConfigModule,
   ],
   controllers: [OrderController],

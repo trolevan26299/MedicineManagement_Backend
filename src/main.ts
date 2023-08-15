@@ -7,14 +7,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // swagger
   const config = new DocumentBuilder()
-    .setTitle('Pharmacy management APIs')
-    .setDescription('List APIs for simple pharmacy management by Dev')
+    .setTitle('Long Chau management APIs')
+    .setDescription('List APIs for simple long chau management by Dev')
     .setVersion('1.0')
     .addTag('Auth')
     .addTag('Users')
     .addTag('Medicines')
     .addTag('Categorys')
     .addTag('Customers')
+    .addTag('Orders')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
