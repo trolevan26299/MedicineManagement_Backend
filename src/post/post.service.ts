@@ -117,23 +117,23 @@ export class PostService {
     return await this.postRepository.update(id, updatePost);
   }
 
-  async deletePost(id: number) {
+  async deletePost(id: number): Promise<DeleteResult> {
     const post = await this.postRepository.findOneBy({ id });
     const imagePath = post.thumbnail;
     // Delete post
-    console.log('post', post);
-    console.log('imagePath', imagePath);
-    await this.postRepository.delete(id);
+    const deleteResult = await this.postRepository.delete(id);
     // Delete image
     fs.unlinkSync(imagePath);
+    return deleteResult;
   }
-  async multipleDelete(ids: string[]) {
+  async multipleDelete(ids: string[]): Promise<DeleteResult> {
     const posts = await this.postRepository.findByIds(ids);
-    await this.postRepository.delete({ id: In(ids) });
+    const deleteResult = await this.postRepository.delete({ id: In(ids) });
     // Delete images
     posts.forEach((post) => {
       const imagePath = post.thumbnail;
       fs.unlinkSync(imagePath);
     });
+    return deleteResult;
   }
 }
