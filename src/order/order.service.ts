@@ -3,7 +3,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Order as OrderEntity } from './entities/order.entity';
 import { OrderDetail as OrderDetailEntity } from './entities/order-detail.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, In, Like, Repository, UpdateResult } from 'typeorm';
+import {
+  DeleteResult,
+  Equal,
+  In,
+  Like,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { filterOrderDto } from './dto/filter-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -32,9 +39,9 @@ export class OrderService {
     const skip = (page - 1) * items_per_page;
     const [data, totalCount] = await this.orderRepository.findAndCount({
       where: [
-        // {
-        //   id: Like('%' + keyword + '%'),
-        // },
+        {
+          id: Equal(Number(keyword)),
+        },
         {
           customer: {
             full_name: Like('%' + keyword + '%'),

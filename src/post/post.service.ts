@@ -6,6 +6,7 @@ import { DeleteResult, In, Like, Repository, UpdateResult } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { filterPostDto } from './dto/filter-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import * as fs from 'fs';
 
 @Injectable()
 export class PostService {
@@ -116,10 +117,23 @@ export class PostService {
     return await this.postRepository.update(id, updatePost);
   }
 
-  async deletePost(id: number): Promise<DeleteResult> {
-    return await this.postRepository.delete(id);
+  async deletePost(id: number) {
+    const post = await this.postRepository.findOneBy({ id });
+    const imagePath = post.thumbnail;
+    // Delete post
+    console.log('post', post);
+    console.log('imagePath', imagePath);
+    await this.postRepository.delete(id);
+    // Delete image
+    fs.unlinkSync(imagePath);
   }
-  async multipleDelete(ids: string[]): Promise<DeleteResult> {
-    return await this.postRepository.delete({ id: In(ids) });
+  async multipleDelete(ids: string[]) {
+    const posts = await this.postRepository.findByIds(ids);
+    await this.postRepository.delete({ id: In(ids) });
+    // Delete images
+    posts.forEach((post) => {
+      const imagePath = post.thumbnail;
+      fs.unlinkSync(imagePath);
+    });
   }
 }
