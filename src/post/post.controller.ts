@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   ParseArrayPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -26,6 +27,8 @@ import { filterPostDto } from './dto/filter-post.dto';
 import { Post as PostEntity } from './entities/post.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { UpdateSaleMedicineByEachDto } from './dto/update-sales-by-each.dto';
+import { UpdateSalesMedicineByCategoryDto } from './dto/update-sales-by-category.dto';
 
 @ApiBearerAuth()
 @ApiTags('Medicines')
@@ -147,5 +150,24 @@ export class PostController {
   @Delete(':id')
   deletePost(@Param('id') id: string) {
     return this.postService.deletePost(Number(id));
+  }
+
+  //Sale medicine by each medicine
+  @UseGuards(AuthGuard)
+  @Patch('sales')
+  updateSaleMedicineByEach(
+    @Req() req: any,
+    @Body() updateSaleMedicineByEach: UpdateSaleMedicineByEachDto[],
+  ): Promise<any> {
+    return this.postService.updateSaleByEach(updateSaleMedicineByEach);
+  }
+  //Sale medicine by each category
+  @UseGuards(AuthGuard)
+  @Patch('sales-category')
+  updateSaleMedicineByCategory(
+    @Req() req: any,
+    @Body() updateSalesMedicineByCategory: UpdateSalesMedicineByCategoryDto[],
+  ): Promise<any> {
+    return this.postService.updateSaleByCategory(updateSalesMedicineByCategory);
   }
 }

@@ -7,6 +7,8 @@ import { User } from 'src/user/entities/user.entity';
 import { filterPostDto } from './dto/filter-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import * as fs from 'fs';
+import { UpdateSaleMedicineByEachDto } from './dto/update-sales-by-each.dto';
+import { UpdateSalesMedicineByCategoryDto } from './dto/update-sales-by-category.dto';
 
 @Injectable()
 export class PostService {
@@ -135,5 +137,38 @@ export class PostService {
       fs.unlinkSync(imagePath);
     });
     return deleteResult;
+  }
+
+  async updateSaleByEach(
+    updateSaleMedicineByEach: UpdateSaleMedicineByEachDto[],
+  ): Promise<any> {
+    for (const item of updateSaleMedicineByEach) {
+      const post = await this.postRepository.findOneBy({
+        id: item.id_medicine,
+      });
+      post.price_sale = item.price_sale;
+      await this.postRepository.update(post.id, post);
+    }
+  }
+
+  async updateSaleByCategory(
+    updateSalesMedicineByCategory: UpdateSalesMedicineByCategoryDto[],
+  ): Promise<any> {
+    for (const item of updateSalesMedicineByCategory) {
+      const medicineByCategory = await this.postRepository.find({
+        where: {
+          category: {
+            id: item.id_category,
+          },
+        },
+      });
+
+      for (const medicine of medicineByCategory) {
+        await this.postRepository.update(medicine.id, {
+          price_sale:
+            medicine.price - medicine.price * (item.percent_sales / 100),
+        });
+      }
+    }
   }
 }
