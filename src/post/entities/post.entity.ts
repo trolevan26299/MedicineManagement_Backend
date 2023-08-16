@@ -33,7 +33,7 @@ export class Post {
   @Column()
   price: number;
 
-  @Column()
+  @Column({ type: 'int', default: 0 })
   price_sale: number;
 
   @Column({ type: 'int', default: 1 })

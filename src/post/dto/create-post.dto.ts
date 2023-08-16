@@ -22,6 +22,9 @@ export class CreatePostDto {
   price: number;
 
   @ApiProperty()
+  price_sale: number;
+
+  @ApiProperty()
   status: number;
 
   user: User;
