@@ -165,6 +165,7 @@ export class OrderService {
     console.log('id', id);
     order.description = updateOrder.description;
     order.total_price = updateOrder.total_price;
+    order.customer = updateOrder.customer;
     // update the order with the new details
 
     await this.orderRepository.save(order);

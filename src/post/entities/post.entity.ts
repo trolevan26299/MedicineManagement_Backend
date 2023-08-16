@@ -33,6 +33,9 @@ export class Post {
   @Column()
   price: number;
 
+  @Column()
+  price_sale: number;
+
   @Column({ type: 'int', default: 1 })
   status: number;
 
