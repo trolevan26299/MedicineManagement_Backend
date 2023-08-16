@@ -135,11 +135,18 @@ export class OrderService {
       });
       for (const detail of createOrder.details) {
         const post = await this.postRepository.findOneBy({ id: detail.id });
+        const quantityMedicine = post.quantity;
         const orderDetail = new OrderDetailEntity();
         orderDetail.order = order;
         orderDetail.post = post;
         orderDetail.count = detail.count;
         await this.orderDetailRepository.insert(orderDetail);
+        await this.postRepository.update(
+          { id: detail.id },
+          {
+            quantity: quantityMedicine - orderDetail.count,
+          },
+        );
       }
       return await this.orderRepository.findOneBy({ id: order.id });
     } catch (error) {
@@ -159,6 +166,7 @@ export class OrderService {
     order.description = updateOrder.description;
     order.total_price = updateOrder.total_price;
     // update the order with the new details
+
     await this.orderRepository.save(order);
 
     await this.orderDetailRepository.delete({ order });
@@ -166,6 +174,7 @@ export class OrderService {
     // add the new details in the order_detail table
     for (const detail of updateOrder.details) {
       const post = await this.postRepository.findOneBy({ id: detail.id });
+      const quantityMedicine = post.quantity;
       const orderDetail = new OrderDetailEntity();
       orderDetail.order = order;
       orderDetail.post = post;
@@ -175,6 +184,50 @@ export class OrderService {
 
     return await this.orderRepository.findOneBy({ id });
   }
+  // async updateOrder(
+  //   id: number,
+  //   updateOrder: UpdateOrderDto,
+  // ): Promise<OrderEntity> {
+  //   // find the order by id
+  //   const order = await this.orderRepository.findOne({
+  //     where: { id },
+  //     relations: ['details'],
+  //   });
+  //   order.description = updateOrder.description;
+  //   order.total_price = updateOrder.total_price;
+  //   // update the order with the new details
+  //   await this.orderRepository.save(order);
+  //   console.log('order', order);
+  //   console.log('updateOrder', updateOrder);
+
+  //   // Step 1
+  //   if (updateOrder.details) {
+  //     await this.orderDetailRepository.delete({ order });
+  //     for (const detail of updateOrder.details) {
+  //       const post = await this.postRepository.findOneBy({ id: detail.id });
+  //       if (
+  //         order.details[detail.id] &&
+  //         detail.count > order.details[detail.id].count
+  //       ) {
+  //         post.quantity -= detail.count - order.details[detail.id].count;
+  //         await this.postRepository.save(post);
+  //       }
+  //       if (
+  //         order.details[detail.id] &&
+  //         detail.count < order.details[detail.id].count
+  //       ) {
+  //         post.quantity += order.details[detail.id].count - detail.count;
+  //         await this.postRepository.save(post);
+  //       }
+  //       const orderDetail = new OrderDetailEntity();
+  //       orderDetail.order = order;
+  //       orderDetail.post = post;
+  //       orderDetail.count = detail.count;
+  //       await this.orderDetailRepository.save(orderDetail);
+  //     }
+  //   }
+  //   return await this.orderRepository.findOneBy({ id });
+  // }
   async deleteOrder(id: number): Promise<DeleteResult> {
     // Delete the order details first
     await this.orderDetailRepository.delete({ order: { id } });

@@ -43,6 +43,15 @@ export class CustomerController {
   getDetailCustomer(@Param('id') id: string): Promise<CustomerEntity> {
     return this.customerService.getDetailCustomer(Number(id));
   }
+  //Get details order a customer
+  @UseGuards(AuthGuard)
+  @Get('order/:id')
+  getDetailOrderCustomer(
+    @Param('id') id: string,
+    @Query() query: filterCustomerDto,
+  ): Promise<Promise<any>> {
+    return this.customerService.getDetailOrderCustomer(Number(id), query);
+  }
 
   // create customer
   @UseGuards(AuthGuard)
