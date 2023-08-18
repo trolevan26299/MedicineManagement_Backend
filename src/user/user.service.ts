@@ -77,7 +77,11 @@ export class UserService {
     id: number,
     updateUser: UpdateUserDto,
   ): Promise<UpdateResult> {
-    return await this.userRepository.update(id, updateUser);
+    const hashPW = await bcrypt.hash(updateUser.password, 10);
+    return await this.userRepository.update(id, {
+      ...updateUser,
+      password: hashPW,
+    });
   }
   async deleteUser(id: number): Promise<DeleteResult> {
     return await this.userRepository.delete(id);
