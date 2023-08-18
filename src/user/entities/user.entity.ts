@@ -42,6 +42,9 @@ export class User {
   @CreateDateColumn()
   updated_at: Date;
 
+  @Column({ default: 'user' })
+  permission: string;
+
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
 

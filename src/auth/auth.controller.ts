@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Req,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -9,7 +12,8 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthService } from './auth.service';
 import { User } from 'src/user/entities/user.entity';
 import { LoginUserDto } from './dto/login-user.dto';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from './auth.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -33,5 +37,12 @@ export class AuthController {
   @Post('refresh-token')
   refreshToken(@Body() { refresh_token }): Promise<any> {
     return this.authService.refreshToken(refresh_token);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Get('getUserPermissions')
+  getAuthUser(@Req() req: any): Promise<User> {
+    return this.authService.getAuthUser(req['user_data'].id);
   }
 }

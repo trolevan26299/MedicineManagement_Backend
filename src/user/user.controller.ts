@@ -36,8 +36,10 @@ export class UserController {
   @ApiQuery({ name: 'items_per_page', required: false })
   @ApiQuery({ name: 'keyword', required: false })
   @Get()
-  findAllUsers(@Query() query: FilterUserDto): Promise<User[]> {
-    console.log(query);
+  findAllUsers(
+    @Req() req: any,
+    @Query() query: FilterUserDto,
+  ): Promise<User[]> {
     return this.userService.findAllUsers(query);
   }
 
