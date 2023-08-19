@@ -1,23 +1,16 @@
 /* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Order as OrderEntity } from './entities/order.entity';
-import { OrderDetail as OrderDetailEntity } from './entities/order-detail.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  DeleteResult,
-  Equal,
-  In,
-  Like,
-  Repository,
-  UpdateResult,
-} from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
-import { filterOrderDto } from './dto/filter-order.dto';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { Customer } from 'src/customer/entities/customer.entity';
+import { UpdateMultiDto } from 'src/post/dto/update-post-multi.dto';
 import { Post } from 'src/post/entities/post.entity';
+import { User } from 'src/user/entities/user.entity';
+import { DeleteResult, Equal, In, Like, Repository } from 'typeorm';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { filterOrderDto } from './dto/filter-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { OrderDetail as OrderDetailEntity } from './entities/order-detail.entity';
+import { Order as OrderEntity } from './entities/order.entity';
 
 @Injectable()
 export class OrderService {
@@ -156,26 +149,31 @@ export class OrderService {
       );
     }
   }
+
   async updateOrder(
     id: number,
     updateOrder: UpdateOrderDto,
   ): Promise<OrderEntity> {
     // find the order by id
-    const order = await this.orderRepository.findOneBy({ id });
-    console.log('id', id);
-    order.description = updateOrder.description;
-    order.total_price = updateOrder.total_price;
-    order.customer = updateOrder.customer;
-    // update the order with the new details
+    const order = await this.orderRepository.findOne({
+      where: { id },
+      relations: ['details'],
+    });
 
-    await this.orderRepository.save(order);
+    await this.orderRepository.update(
+      { id },
+      {
+        description: updateOrder.description,
+        total_price: updateOrder.total_price,
+        customer: updateOrder.customer,
+      },
+    );
 
     await this.orderDetailRepository.delete({ order });
 
     // add the new details in the order_detail table
     for (const detail of updateOrder.details) {
       const post = await this.postRepository.findOneBy({ id: detail.id });
-      const quantityMedicine = post.quantity;
       const orderDetail = new OrderDetailEntity();
       orderDetail.order = order;
       orderDetail.post = post;
@@ -185,52 +183,22 @@ export class OrderService {
 
     return await this.orderRepository.findOneBy({ id });
   }
-  // async updateOrder(
-  //   id: number,
-  //   updateOrder: UpdateOrderDto,
-  // ): Promise<OrderEntity> {
-  //   // find the order by id
-  //   const order = await this.orderRepository.findOne({
-  //     where: { id },
-  //     relations: ['details'],
-  //   });
-  //   order.description = updateOrder.description;
-  //   order.total_price = updateOrder.total_price;
-  //   // update the order with the new details
-  //   await this.orderRepository.save(order);
-  //   console.log('order', order);
-  //   console.log('updateOrder', updateOrder);
 
-  //   // Step 1
-  //   if (updateOrder.details) {
-  //     await this.orderDetailRepository.delete({ order });
-  //     for (const detail of updateOrder.details) {
-  //       const post = await this.postRepository.findOneBy({ id: detail.id });
-  //       if (
-  //         order.details[detail.id] &&
-  //         detail.count > order.details[detail.id].count
-  //       ) {
-  //         post.quantity -= detail.count - order.details[detail.id].count;
-  //         await this.postRepository.save(post);
-  //       }
-  //       if (
-  //         order.details[detail.id] &&
-  //         detail.count < order.details[detail.id].count
-  //       ) {
-  //         post.quantity += order.details[detail.id].count - detail.count;
-  //         await this.postRepository.save(post);
-  //       }
-  //       const orderDetail = new OrderDetailEntity();
-  //       orderDetail.order = order;
-  //       orderDetail.post = post;
-  //       orderDetail.count = detail.count;
-  //       await this.orderDetailRepository.save(orderDetail);
-  //     }
-  //   }
-  //   return await this.orderRepository.findOneBy({ id });
-  // }
-  async deleteOrder(id: number): Promise<DeleteResult> {
+  async deleteOrder(id: number) {
     // Delete the order details first
+    const orderDelete = await this.orderRepository.findOne({
+      where: { id },
+      relations: ['details'],
+    });
+    for (const detailDelete of orderDelete.details) {
+      const postDelete = await this.postRepository.findOne({
+        where: { id: detailDelete.post_id },
+      });
+      await this.postRepository.update(postDelete.id, {
+        ...postDelete,
+        quantity: postDelete.quantity + detailDelete.count,
+      });
+    }
     await this.orderDetailRepository.delete({ order: { id } });
     // Delete the order
     return await this.orderRepository.delete(id);
@@ -241,4 +209,15 @@ export class OrderService {
     // Delete the orders
     return await this.orderRepository.delete({ id: In(ids) });
   }
+
+  // async updatePostMulti(updatePostMulti: UpdateMultiDto[]): Promise<any> {
+  //   console.log('-------------aaaaa', updatePostMulti);
+  //   for (const post of updatePostMulti) {
+  //     return await this.postRepository.update(
+  //       { id: post.id },
+  //       { quantity: post.quantity },
+  //     );
+  //   }
+  //   return updatePostMulti;
+  // }
 }

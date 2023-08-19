@@ -9,6 +9,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import * as fs from 'fs';
 import { UpdateSaleMedicineByEachDto } from './dto/update-sales-by-each.dto';
 import { UpdateSalesMedicineByCategoryDto } from './dto/update-sales-by-category.dto';
+import { UpdateMultiDto } from './dto/update-post-multi.dto';
 
 @Injectable()
 export class PostService {

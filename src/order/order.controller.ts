@@ -20,6 +20,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { filterOrderDto } from './dto/filter-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { UpdateMultiDto } from 'src/post/dto/update-post-multi.dto';
 
 @ApiBearerAuth()
 @ApiTags('Orders')
@@ -66,7 +67,7 @@ export class OrderController {
     @Body() updateOrder: UpdateOrderDto,
   ): Promise<any> {
     console.log(req['user_data']);
-    console.log('createOrder', updateOrder);
+    console.log('updateOrder', updateOrder);
     return this.orderService.updateOrder(Number(id), updateOrder);
   }
 
@@ -85,5 +86,12 @@ export class OrderController {
     ids: string[],
   ) {
     return this.orderService.multipleDelete(ids);
+  }
+
+  // update post-multi
+  @UseGuards(AuthGuard)
+  @Put('update-multiple')
+  updatePostMulti(@Body() updatePostMulti: UpdateMultiDto[]): Promise<any> {
+    return this.orderService.updatePostMulti(updatePostMulti);
   }
 }

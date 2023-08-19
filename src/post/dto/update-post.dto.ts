@@ -2,8 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Category } from 'src/category/entities/category.entity';
 
 export class UpdatePostDto {
-  @ApiProperty()
-  title: string;
+  z;
   @ApiProperty()
   description: string;
 
