@@ -99,7 +99,7 @@ export class PostController {
   }
   // update post
   @UseGuards(AuthGuard)
-  @Put(':id')
+  @Put('update/:id')
   @UseInterceptors(
     FileInterceptor('thumbnail', {
       storage: storageConfig('post'),
@@ -170,5 +170,12 @@ export class PostController {
     @Body() updateSalesMedicineByCategory: UpdateSalesMedicineByCategoryDto[],
   ): Promise<any> {
     return this.postService.updateSaleByCategory(updateSalesMedicineByCategory);
+  }
+
+  // update post-multi
+  @UseGuards(AuthGuard)
+  @Put('update-multiple')
+  updatePostMulti(@Body() updatePostMulti: UpdateMultiDto[]): Promise<any> {
+    return this.postService.updatePostMulti(updatePostMulti);
   }
 }

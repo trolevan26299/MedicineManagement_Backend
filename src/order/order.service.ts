@@ -209,15 +209,4 @@ export class OrderService {
     // Delete the orders
     return await this.orderRepository.delete({ id: In(ids) });
   }
-
-  // async updatePostMulti(updatePostMulti: UpdateMultiDto[]): Promise<any> {
-  //   console.log('-------------aaaaa', updatePostMulti);
-  //   for (const post of updatePostMulti) {
-  //     return await this.postRepository.update(
-  //       { id: post.id },
-  //       { quantity: post.quantity },
-  //     );
-  //   }
-  //   return updatePostMulti;
-  // }
 }

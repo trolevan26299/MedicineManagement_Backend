@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseArrayPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -66,7 +67,7 @@ export class OrderController {
     @Req() req: any,
     @Body() updateOrder: UpdateOrderDto,
   ): Promise<any> {
-    console.log(req['user_data']);
+    console.log('abc', req['user_data']);
     console.log('updateOrder', updateOrder);
     return this.orderService.updateOrder(Number(id), updateOrder);
   }
@@ -86,12 +87,5 @@ export class OrderController {
     ids: string[],
   ) {
     return this.orderService.multipleDelete(ids);
-  }
-
-  // update post-multi
-  @UseGuards(AuthGuard)
-  @Put('update-multiple')
-  updatePostMulti(@Body() updatePostMulti: UpdateMultiDto[]): Promise<any> {
-    return this.orderService.updatePostMulti(updatePostMulti);
   }
 }

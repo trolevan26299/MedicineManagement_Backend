@@ -172,4 +172,14 @@ export class PostService {
       }
     }
   }
+
+  async updatePostMulti(updatePostMulti: UpdateMultiDto[]): Promise<any> {
+    for (const post of updatePostMulti) {
+      await this.postRepository.update(
+        { id: post.id },
+        { quantity: post.quantity },
+      );
+    }
+    return updatePostMulti;
+  }
 }
