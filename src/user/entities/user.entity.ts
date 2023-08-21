@@ -45,15 +45,27 @@ export class User {
   @Column({ default: 'user' })
   permission: string;
 
-  @OneToMany(() => Post, (post) => post.user)
+  @OneToMany(() => Post, (post) => post.user, {
+    cascade: true,
+    onDelete: 'SET NULL',
+  })
   posts: Post[];
 
-  @OneToMany(() => Category, (category) => category.user)
+  @OneToMany(() => Category, (category) => category.user, {
+    cascade: true,
+    onDelete: 'SET NULL',
+  })
   category: Category[];
 
-  @OneToMany(() => Order, (order) => order.users)
+  @OneToMany(() => Order, (order) => order.users, {
+    cascade: true,
+    onDelete: 'SET NULL',
+  })
   order: Order[];
 
-  @OneToMany(() => Customer, (customer) => customer.user)
+  @OneToMany(() => Customer, (customer) => customer.user, {
+    cascade: true,
+    onDelete: 'SET NULL',
+  })
   customer: Order[];
 }

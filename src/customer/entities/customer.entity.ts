@@ -39,9 +39,12 @@ export class Customer {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => User, (user) => user.customer)
+  @ManyToOne(() => User, (user) => user.customer, { onDelete: 'SET NULL' })
   user: User;
 
-  @OneToMany(() => Order, (order) => order.customer)
+  @OneToMany(() => Order, (order) => order.customer, {
+    cascade: true,
+    onDelete: 'SET NULL',
+  })
   order: Order[];
 }
