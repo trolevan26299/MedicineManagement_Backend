@@ -67,7 +67,7 @@ export class AuthService {
 
     await this.mailerService.sendMail({
       to: user.email,
-      from: 'trolevan26299@gmail.com',
+      from: 'Long châu',
       subject: 'Long Chau Management',
       html: `
       <div style="background-color: #f5f5f5; padding: 20px;">
