@@ -28,23 +28,10 @@ import { join } from 'path';
       useFactory: async (config: ConfigService) => ({
         //transport:config.get('MAIL_TRANSPORT')
         transport: {
-          // host: config.get('MAIL_HOST'),
           host: 'smtp.gmail.com',
-          // secure: false,
           auth: {
-            // user: config.get('MAIL_USER'),
             user: 'trolevan26299@gmail.com',
-            // pass: config.get('MAIL_PASSWORD'),
             pass: 'iwyjbyamkecawecp',
-          },
-        },
-        defaults: {
-          from: `"No Reply" <${config.get('MAIL_FROM')}>`,
-        },
-        template: {
-          dir: join(__dirname, 'src/templates/email'),
-          options: {
-            strict: true,
           },
         },
       }),
