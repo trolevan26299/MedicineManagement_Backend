@@ -14,6 +14,7 @@ import { User } from 'src/user/entities/user.entity';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from './auth.guard';
+import { ForgetPassUserDto } from './dto/forgetPass-user.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -32,6 +33,11 @@ export class AuthController {
   @UsePipes(ValidationPipe)
   login(@Body() loginUser: LoginUserDto): Promise<any> {
     return this.authService.login(loginUser);
+  }
+  @Post('forget-password')
+  @UsePipes(ValidationPipe)
+  forgetPassword(@Body() forgetPassUser: ForgetPassUserDto): Promise<any> {
+    return this.authService.forgetPass(forgetPassUser);
   }
 
   @Post('refresh-token')
