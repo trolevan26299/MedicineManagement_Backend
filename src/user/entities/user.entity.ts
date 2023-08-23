@@ -1,7 +1,8 @@
+/* eslint-disable prettier/prettier */
 import { Category } from 'src/category/entities/category.entity';
 import { Customer } from 'src/customer/entities/customer.entity';
 import { Order } from 'src/order/entities/order.entity';
-import { Post } from 'src/post/entities/post.entity';
+import { Medicine } from 'src/medicine/entities/medicine.entity';
 import {
   Entity,
   Column,
@@ -45,10 +46,10 @@ export class User {
   @Column({ default: 'user' })
   permission: string;
 
-  @OneToMany(() => Post, (post) => post.user, {
+  @OneToMany(() => Medicine, (medicine) => medicine.user, {
     onDelete: 'SET NULL',
   })
-  posts: Post[];
+  medicines: Medicine[];
 
   @OneToMany(() => Category, (category) => category.user, {
     onDelete: 'SET NULL',

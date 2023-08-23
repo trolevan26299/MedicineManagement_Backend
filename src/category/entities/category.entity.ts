@@ -1,5 +1,5 @@
-import { type } from 'os';
-import { Post } from 'src/post/entities/post.entity';
+/* eslint-disable prettier/prettier */
+import { Medicine } from 'src/medicine/entities/medicine.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -34,8 +34,8 @@ export class Category {
   @ManyToOne(() => User, (user) => user.category)
   user: User;
 
-  @OneToMany(() => Post, (post) => post.category, {
+  @OneToMany(() => Medicine, (medicine) => medicine.category, {
     onDelete: 'SET NULL',
   })
-  posts: Post[];
+  medicines: Medicine[];
 }

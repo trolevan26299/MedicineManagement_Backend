@@ -3,7 +3,7 @@ import { User } from 'src/user/entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from 'src/category/entities/category.entity';
 
-export class CreatePostDto {
+export class CreateMedicineDto {
   @ApiProperty()
   @IsNotEmpty()
   title: string;

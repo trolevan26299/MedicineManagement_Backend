@@ -1,5 +1,5 @@
+/* eslint-disable prettier/prettier */
 import { Customer } from 'src/customer/entities/customer.entity';
-import { Post } from 'src/post/entities/post.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
@@ -8,7 +8,6 @@ import {
   CreateDateColumn,
   OneToMany,
   ManyToOne,
-  ManyToMany,
 } from 'typeorm';
 
 import { OrderDetail } from './order-detail.entity';

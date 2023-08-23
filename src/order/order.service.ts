@@ -1,9 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Customer } from 'src/customer/entities/customer.entity';
-import { UpdateMultiDto } from 'src/post/dto/update-post-multi.dto';
-import { Post } from 'src/post/entities/post.entity';
+import { Medicine } from 'src/medicine/entities/medicine.entity';
 import { User } from 'src/user/entities/user.entity';
 import { DeleteResult, Equal, In, Like, Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -18,10 +16,8 @@ export class OrderService {
     @InjectRepository(OrderEntity)
     private orderRepository: Repository<OrderEntity>,
     @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Customer)
-    private customerRepository: Repository<Customer>,
-    @InjectRepository(Post)
-    private postRepository: Repository<Post>,
+    @InjectRepository(Medicine)
+    private medicineRepository: Repository<Medicine>,
     @InjectRepository(OrderDetailEntity)
     private orderDetailRepository: Repository<OrderDetailEntity>,
   ) {}
@@ -63,7 +59,7 @@ export class OrderService {
         users: true,
         customer: true,
         details: {
-          post: true,
+          medicine: true,
         },
       },
       select: {
@@ -102,7 +98,7 @@ export class OrderService {
   async getDetailOrder(id: number): Promise<OrderEntity> {
     return await this.orderRepository.findOne({
       where: { id },
-      relations: { customer: true, details: { post: true } },
+      relations: { customer: true, details: { medicine: true } },
       select: {
         customer: {
           id: true,
@@ -127,14 +123,16 @@ export class OrderService {
         users,
       });
       for (const detail of createOrder.details) {
-        const post = await this.postRepository.findOneBy({ id: detail.id });
-        const quantityMedicine = post.quantity;
+        const medicine = await this.medicineRepository.findOneBy({
+          id: detail.id,
+        });
+        const quantityMedicine = medicine.quantity;
         const orderDetail = new OrderDetailEntity();
         orderDetail.order = order;
-        orderDetail.post = post;
+        orderDetail.medicine = medicine;
         orderDetail.count = detail.count;
         await this.orderDetailRepository.insert(orderDetail);
-        await this.postRepository.update(
+        await this.medicineRepository.update(
           { id: detail.id },
           {
             quantity: quantityMedicine - orderDetail.count,
@@ -173,10 +171,12 @@ export class OrderService {
 
     // add the new details in the order_detail table
     for (const detail of updateOrder.details) {
-      const post = await this.postRepository.findOneBy({ id: detail.id });
+      const medicine = await this.medicineRepository.findOneBy({
+        id: detail.id,
+      });
       const orderDetail = new OrderDetailEntity();
       orderDetail.order = order;
-      orderDetail.post = post;
+      orderDetail.medicine = medicine;
       orderDetail.count = detail.count;
       await this.orderDetailRepository.save(orderDetail);
     }
@@ -191,12 +191,12 @@ export class OrderService {
       relations: ['details'],
     });
     for (const detailDelete of orderDelete.details) {
-      const postDelete = await this.postRepository.findOne({
-        where: { id: detailDelete.post_id },
+      const medicineDelete = await this.medicineRepository.findOne({
+        where: { id: detailDelete.medicine_id },
       });
-      await this.postRepository.update(postDelete.id, {
-        ...postDelete,
-        quantity: postDelete.quantity + detailDelete.count,
+      await this.medicineRepository.update(medicineDelete.id, {
+        ...medicineDelete,
+        quantity: medicineDelete.quantity + detailDelete.count,
       });
     }
     await this.orderDetailRepository.delete({ order: { id } });

@@ -1,4 +1,5 @@
-export class filterPostDto {
+/* eslint-disable prettier/prettier */
+export class filterMedicineDto {
   page: string;
 
   items_per_page: string;

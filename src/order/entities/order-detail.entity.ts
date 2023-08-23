@@ -7,7 +7,7 @@ import {
   RelationId,
 } from 'typeorm';
 import { Order } from './order.entity';
-import { Post } from 'src/post/entities/post.entity';
+import { Medicine } from 'src/medicine/entities/medicine.entity';
 
 @Entity()
 export class OrderDetail {
@@ -21,12 +21,12 @@ export class OrderDetail {
   @RelationId((orderDetail: OrderDetail) => orderDetail.order)
   order_id: number;
 
-  @ManyToOne(() => Post, (post) => post.details)
-  @JoinColumn({ name: 'post_id' })
-  post: Post;
+  @ManyToOne(() => Medicine, (medicine) => medicine.details)
+  @JoinColumn({ name: 'medicine_id' })
+  medicine: Medicine;
 
-  @RelationId((orderDetail: OrderDetail) => orderDetail.post)
-  post_id: number;
+  @RelationId((orderDetail: OrderDetail) => orderDetail.medicine)
+  medicine_id: number;
 
   @Column()
   count: number;

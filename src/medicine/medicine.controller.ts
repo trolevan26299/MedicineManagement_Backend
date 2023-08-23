@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   BadRequestException,
   Body,
@@ -17,33 +18,33 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreateMedicineDto } from './dto/create-medicine.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { storageConfig } from 'helpers/config';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { extname } from 'path';
-import { PostService } from './post.service';
-import { filterPostDto } from './dto/filter-post.dto';
-import { Post as PostEntity } from './entities/post.entity';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { MedicineService } from './medicine.service';
+import { filterMedicineDto } from './dto/filter-medicine.dto';
+import { Medicine as MedicineEntity } from './entities/medicine.entity';
+import { UpdateMedicineDto } from './dto/update-medicine.dto';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UpdateSaleMedicineByEachDto } from './dto/update-sales-by-each.dto';
 import { UpdateSalesMedicineByCategoryDto } from './dto/update-sales-by-category.dto';
-import { UpdateMultiDto } from './dto/update-post-multi.dto';
+import { UpdateMultiDto } from './dto/update-medicine-multi.dto';
 
 @ApiBearerAuth()
 @ApiTags('Medicines')
-@Controller('posts')
-export class PostController {
-  constructor(private postService: PostService) {}
+@Controller('medicines')
+export class MedicineController {
+  constructor(private medicineService: MedicineService) {}
 
-  // create post
+  // create medicine
   @UseGuards(AuthGuard)
   @UsePipes(ValidationPipe)
   @Post()
   @UseInterceptors(
     FileInterceptor('thumbnail', {
-      storage: storageConfig('post'),
+      storage: storageConfig('medicine'),
       fileFilter: (req, file, cb) => {
         const ext = extname(file.originalname);
         const allowedExtArr = ['.jpg', '.png', '.jpeg'];
@@ -65,11 +66,11 @@ export class PostController {
   )
   create(
     @Req() req: any,
-    @Body() createPost: CreatePostDto,
+    @Body() createMedicine: CreateMedicineDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     console.log(req['user_data']);
-    console.log('createPost', createPost);
+    console.log('createMedicine', createMedicine);
     console.log('file', file);
     if (req.fileValidationError) {
       throw new BadRequestException(req.fileValidationError);
@@ -77,32 +78,32 @@ export class PostController {
     if (!file) {
       throw new BadRequestException('File is required');
     }
-    return this.postService.create(req['user_data'].id, {
-      ...createPost,
+    return this.medicineService.create(req['user_data'].id, {
+      ...createMedicine,
       thumbnail: file.destination + '/' + file.filename,
     });
   }
-  // get all post
+  // get all medicine
   @UseGuards(AuthGuard)
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'items_per_page', required: false })
   @ApiQuery({ name: 'keyword', required: false })
   @Get()
-  getAllPost(@Query() query: filterPostDto): Promise<any> {
-    return this.postService.getAllPost(query);
+  getAllMedicine(@Query() query: filterMedicineDto): Promise<any> {
+    return this.medicineService.getAllMedicine(query);
   }
-  // get detail post
+  // get detail medicine
   @UseGuards(AuthGuard)
   @Get(':id')
-  getDetailPost(@Param('id') id: string): Promise<PostEntity> {
-    return this.postService.getDetailPost(Number(id));
+  getDetailMedicine(@Param('id') id: string): Promise<MedicineEntity> {
+    return this.medicineService.getDetailMedicine(Number(id));
   }
-  // update post
+  // update medicine
   @UseGuards(AuthGuard)
   @Put('update/:id')
   @UseInterceptors(
     FileInterceptor('thumbnail', {
-      storage: storageConfig('post'),
+      storage: storageConfig('medicine'),
       fileFilter: (req, file, cb) => {
         const ext = extname(file.originalname);
         const allowedExtArr = ['.jpg', '.png', '.jpeg'];
@@ -125,32 +126,32 @@ export class PostController {
   update(
     @Param('id') id: string,
     @Req() req: any,
-    @Body() updatePost: UpdatePostDto,
+    @Body() updateMedicine: UpdateMedicineDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<any> {
     if (req.fileValidationError) {
       throw new BadRequestException(req.fileValidationError);
     }
     if (file) {
-      updatePost.thumbnail = file.destination + '/' + file.filename;
+      updateMedicine.thumbnail = file.destination + '/' + file.filename;
     }
-    return this.postService.updatePost(Number(id), updatePost);
+    return this.medicineService.updateMedicine(Number(id), updateMedicine);
   }
 
-  // Delete Posts
+  // Delete Medicines
   @UseGuards(AuthGuard)
   @Delete('multiple')
   multipleDelete(
     @Query('ids', new ParseArrayPipe({ items: String, separator: ',' }))
     ids: string[],
   ) {
-    return this.postService.multipleDelete(ids);
+    return this.medicineService.multipleDelete(ids);
   }
-  //delete one post
+  //delete one medicine
   @UseGuards(AuthGuard)
   @Delete(':id')
-  deletePost(@Param('id') id: string) {
-    return this.postService.deletePost(Number(id));
+  deleteMedicine(@Param('id') id: string) {
+    return this.medicineService.deleteMedicine(Number(id));
   }
 
   //Sale medicine by each medicine
@@ -160,7 +161,7 @@ export class PostController {
     @Req() req: any,
     @Body() updateSaleMedicineByEach: UpdateSaleMedicineByEachDto[],
   ): Promise<any> {
-    return this.postService.updateSaleByEach(updateSaleMedicineByEach);
+    return this.medicineService.updateSaleByEach(updateSaleMedicineByEach);
   }
   //Sale medicine by each category
   @UseGuards(AuthGuard)
@@ -169,13 +170,17 @@ export class PostController {
     @Req() req: any,
     @Body() updateSalesMedicineByCategory: UpdateSalesMedicineByCategoryDto[],
   ): Promise<any> {
-    return this.postService.updateSaleByCategory(updateSalesMedicineByCategory);
+    return this.medicineService.updateSaleByCategory(
+      updateSalesMedicineByCategory,
+    );
   }
 
-  // update post-multi
+  // update medicine-multi
   @UseGuards(AuthGuard)
   @Put('update-multiple')
-  updatePostMulti(@Body() updatePostMulti: UpdateMultiDto[]): Promise<any> {
-    return this.postService.updatePostMulti(updatePostMulti);
+  updateMedicineMulti(
+    @Body() updateMedicineMulti: UpdateMultiDto[],
+  ): Promise<any> {
+    return this.medicineService.updateMedicineMulti(updateMedicineMulti);
   }
 }

@@ -1,14 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Customer as CustomerEntity } from './entities/customer.entity';
-import {
-  DeleteResult,
-  In,
-  Like,
-  OrderedBulkOperation,
-  Repository,
-  UpdateResult,
-} from 'typeorm';
+import { DeleteResult, In, Like, Repository, UpdateResult } from 'typeorm';
 import { Order as OrderEntity } from '../order/entities/order.entity';
 import { User } from 'src/user/entities/user.entity';
 import { CreateCustomerDto } from './dto/create-customer.dto';
@@ -124,7 +117,6 @@ export class CustomerService {
   ): Promise<Promise<any>> {
     const items_per_page = Number(query.items_per_page) || 10;
     const page = Number(query.page) || 1;
-    const keyword = query.keyword || '';
     const skip = (page - 1) * items_per_page;
     const [data, totalCount] = await this.orderRepository.findAndCount({
       where: [
@@ -140,7 +132,7 @@ export class CustomerService {
       relations: {
         customer: true,
         details: {
-          post: true,
+          medicine: true,
         },
       },
       select: {

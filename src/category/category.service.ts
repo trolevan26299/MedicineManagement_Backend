@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Category as CategoryEntity } from './entities/category.entity';
 import { DeleteResult, In, Like, Repository, UpdateResult } from 'typeorm';
@@ -35,7 +36,7 @@ export class CategoryService {
       skip,
       relations: {
         user: true,
-        posts: true,
+        medicines: true,
       },
       select: {
         user: {
@@ -45,7 +46,7 @@ export class CategoryService {
           email: true,
           avatar: true,
         },
-        posts: {
+        medicines: {
           id: true,
           title: true,
           price: true,

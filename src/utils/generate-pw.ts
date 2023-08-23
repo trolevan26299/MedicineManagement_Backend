@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 export function generateRandomPassword(length: number): string {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let password = '';

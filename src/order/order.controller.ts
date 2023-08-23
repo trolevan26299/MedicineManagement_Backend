@@ -5,7 +5,6 @@ import {
   Get,
   Param,
   ParseArrayPipe,
-  Patch,
   Post,
   Put,
   Query,
@@ -21,7 +20,6 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { filterOrderDto } from './dto/filter-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { UpdateMultiDto } from 'src/post/dto/update-post-multi.dto';
 
 @ApiBearerAuth()
 @ApiTags('Orders')
