@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Req,
   UseGuards,
   UsePipes,
@@ -15,6 +16,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from './auth.guard';
 import { ForgetPassUserDto } from './dto/forgetPass-user.dto';
+import { ChangePasswordDto } from './dto/changePass-user.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -50,5 +52,12 @@ export class AuthController {
   @Get('getUserPermissions')
   getAuthUser(@Req() req: any): Promise<User> {
     return this.authService.getAuthUser(req['user_data'].id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Put('change-password')
+  changePassword(@Body() changePassword: ChangePasswordDto): Promise<any> {
+    return this.authService.changePassword(changePassword);
   }
 }

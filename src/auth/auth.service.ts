@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ForgetPassUserDto } from './dto/forgetPass-user.dto';
 import { generateRandomPassword } from '../utils/generate-pw';
+import { ChangePasswordDto } from './dto/changePass-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -85,6 +86,32 @@ export class AuthService {
   `,
     });
     return 'Password recovery successful. Please check your email for a new password.';
+  }
+
+  async changePassword(changePassword: ChangePasswordDto): Promise<any> {
+    const user = await this.userRepository.findOne({
+      where: { email: changePassword.email },
+    });
+    if (!user) {
+      throw new HttpException('Email is not exist', HttpStatus.UNAUTHORIZED);
+    }
+    const checkPass = bcrypt.compareSync(
+      changePassword.password,
+      user.password,
+    );
+
+    if (!checkPass) {
+      throw new HttpException(
+        'Password is not correct !',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    // Hash mật khẩu mới
+    const hashPassword = await this.hashPassword(changePassword.newPassword);
+    user.password = hashPassword;
+    await this.userRepository.save(user);
+
+    return new HttpException('Change Password successfully !', HttpStatus.OK);
   }
 
   async refreshToken(refresh_token: string): Promise<any> {
