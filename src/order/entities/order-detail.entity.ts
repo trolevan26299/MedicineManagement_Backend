@@ -14,14 +14,14 @@ export class OrderDetail {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Order, (order) => order.details, { onDelete: 'SET NULL' })
+  @ManyToOne(() => Order, (order) => order.details)
   @JoinColumn({ name: 'order_id' })
   order: Order;
 
   @RelationId((orderDetail: OrderDetail) => orderDetail.order)
   order_id: number;
 
-  @ManyToOne(() => Post, (post) => post.details, { onDelete: 'SET NULL' })
+  @ManyToOne(() => Post, (post) => post.details)
   @JoinColumn({ name: 'post_id' })
   post: Post;
 

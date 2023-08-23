@@ -45,16 +45,13 @@ export class Post {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => User, (user) => user.posts, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.posts)
   user: User;
 
-  @ManyToOne(() => Category, (category) => category.posts, {
-    onDelete: 'SET NULL',
-  })
+  @ManyToOne(() => Category, (category) => category.posts)
   category: Category;
 
   @OneToMany(() => OrderDetail, (detail) => detail.post, {
-    cascade: true,
     onDelete: 'SET NULL',
   })
   details: OrderDetail[];
