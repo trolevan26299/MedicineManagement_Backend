@@ -1,0 +1,38 @@
+# docker-compose up -d
+version: '3'
+services:
+  mysql_db:
+    image: mysql
+    container_name: mysql_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=Tro@260299
+      - MYSQL_DATABASE=blog-nestjs-reactjs
+    ports:
+      - 3307:3306
+    volumes:
+      - mysql_db:/var/lib/mysql
+    networks:
+      - node-network
+  node:
+    depends_on:
+      - mysql_db
+    build: .
+    container_name: medicineApp
+    environment:
+      - DATABASE=blog-nestjs-reactjs
+      - USERNAME=root
+      - PASSWORD=Tro@260299
+      - HOST=mysql_db
+      - PORT=3306
+      - DIALECT=mysql
+    ports:
+      - 6969:6969
+    networks:
+      - node-network
+    command:
+      ['./wait-for-it.sh', 'mysql_db:3306', '--', 'node', 'dist/src/main.js']
+volumes:
+  mysql_db:
+    driver: local
+networks:
+  node-network:
