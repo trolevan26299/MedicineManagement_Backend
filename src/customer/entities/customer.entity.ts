@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Order } from 'src/order/entities/order.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
