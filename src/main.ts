@@ -24,7 +24,6 @@ async function bootstrap() {
   app.enableCors();
   app.use(express.static('.')); // định vị lại đường dẫn để load tài nguyên
 
-  app.setGlobalPrefix('api');
   return await app.listen(6969);
 }
 bootstrap();

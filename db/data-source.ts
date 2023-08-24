@@ -11,7 +11,8 @@ export const dataSourceOption: DataSourceOptions = {
   database: 'blog-nestjs-reactjs',
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/db/migrations/*.js'],
-  synchronize: false,
+  // synchronize:false,
+  synchronize: true,
 };
 
 const dataSource = new DataSource(dataSourceOption);
